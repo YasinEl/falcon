@@ -25,7 +25,9 @@ def get_spectra(source: Union[IO, str]) -> Iterable[sus.MsmsSpectrum]:
     with pyteomics.mgf.MGF(source) as f_in:
         for spectrum_i, spectrum_dict in enumerate(f_in):
             try:
-                yield _parse_spectrum(spectrum_dict)
+                spectrum = _parse_spectrum(spectrum_dict)
+                spectrum.identifier = spectrum_dict["params"].get("title", "unknown")
+                yield spectrum
             except (ValueError, KeyError):
                 pass
 
