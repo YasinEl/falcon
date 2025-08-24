@@ -42,21 +42,22 @@ def get_spectra(source: Union[IO, str]) -> Iterable[sus.MsmsSpectrum]:
             )[0]
 
             # Build USI-inspired title
-            if "scans" in params:
-                params["title"] = f"{filename}:scan:{params['scans']}"
-            elif "scan" in params:
-                params["title"] = f"{filename}:scan:{params['scan']}"
+            if "title" not in params:
+                if "scans" in params:
+                    params["title"] = f"{filename}:scan:{params['scans']}"
+                elif "scan" in params:
+                    params["title"] = f"{filename}:scan:{params['scan']}"
+                else:
+                    title = params.get("title", "")
+                    if not USI_PATTERN.match(title):
+                        params["title"] = f"{filename}:index:{spectrum_i}"
             else:
-                title = params.get("title", "")
-                if not USI_PATTERN.match(title):
-                    params["title"] = f"{filename}:index:{spectrum_i}"
-
-            try:
-                spectrum = _parse_spectrum(spectrum_dict)
-                spectrum.identifier = spectrum_dict["params"].get("title", "unknown")
-                yield spectrum
-            except (ValueError, KeyError):
-                continue
+                try:
+                    spectrum = _parse_spectrum(spectrum_dict)
+                    spectrum.identifier = spectrum_dict["params"].get("title", "unknown")
+                    yield spectrum
+                except (ValueError, KeyError):
+                    continue
 
 
 def _parse_spectrum(spectrum_dict: Dict) -> sus.MsmsSpectrum:
