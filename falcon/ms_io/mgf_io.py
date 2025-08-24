@@ -51,13 +51,13 @@ def get_spectra(source: Union[IO, str]) -> Iterable[sus.MsmsSpectrum]:
                     title = params.get("title", "")
                     if not USI_PATTERN.match(title):
                         params["title"] = f"{filename}:index:{spectrum_i}"
-            else:
-                try:
-                    spectrum = _parse_spectrum(spectrum_dict)
-                    spectrum.identifier = spectrum_dict["params"].get("title", "unknown")
-                    yield spectrum
-                except (ValueError, KeyError):
-                    continue
+                    
+            try:
+                spectrum = _parse_spectrum(spectrum_dict)
+                spectrum.identifier = spectrum_dict["params"].get("title", "unknown")
+                yield spectrum
+            except (ValueError, KeyError):
+                continue
 
 
 def _parse_spectrum(spectrum_dict: Dict) -> sus.MsmsSpectrum:
